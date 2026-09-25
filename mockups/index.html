@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TraceCiterne — maquettes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0e1210;
+      --bg-2: #161c19;
+      --panel: #1c2420;
+      --line: #2a3530;
+      --text: #e8eee9;
+      --muted: #8b9a91;
+      --amber: #e4a31a;
+      --amber-dim: #8a6410;
+      --ok: #3dba8b;
+      --warn: #e4a31a;
+      --bad: #e25c4a;
+      --diesel: #3dba8b;
+      --sp: #6ea8ff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: "DM Sans", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100%;
+    }
+    button, a { font-family: inherit; }
+    .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+
+    /* shell */
+    .app { display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; }
+    .app.login-mode { grid-template-columns: 1fr; }
+    .app.login-mode .sidebar, .app.login-mode .topbar { display: none; }
+    .sidebar {
+      background: #121816;
+      border-right: 1px solid var(--line);
+      padding: 20px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px;
+      padding: 4px 8px 18px;
+    }
+    .logo {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(145deg, #f0b429, #9a6a08);
+      display: grid; place-items: center; font-weight: 700; color: #1a1404; font-size: 14px;
+    }
+    .brand small { display: block; color: var(--muted); font-size: 11px; letter-spacing: .04em; }
+    .nav-btn {
+      background: transparent; border: 0; color: var(--muted);
+      text-align: left; padding: 10px 12px; border-radius: 8px;
+      cursor: pointer; font-size: 14px; font-weight: 500;
+    }
+    .nav-btn:hover { background: var(--panel); color: var(--text); }
+    .nav-btn.active { background: #24302a; color: var(--text); box-shadow: inset 2px 0 0 var(--amber); }
+    .nav-label { font-size: 11px; color: var(--muted); letter-spacing: .12em; text-transform: uppercase; padding: 16px 12px 6px; }
+    .main { display: flex; flex-direction: column; min-width: 0; }
+    .topbar {
+      height: 56px; border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 22px; background: #121816;
+    }
+    .crumb { color: var(--muted); font-size: 13px; }
+    .crumb strong { color: var(--text); font-weight: 600; }
+    .who { font-size: 13px; color: var(--muted); }
+    .who b { color: var(--text); font-weight: 600; }
+    .content { padding: 22px; overflow: auto; flex: 1; }
+
+    /* login */
+    .login-wrap {
+      min-height: 100vh; display: grid; place-items: center;
+      background:
+        radial-gradient(900px 400px at 10% 0%, #24301c 0%, transparent 50%),
+        radial-gradient(700px 400px at 100% 100%, #1e2410 0%, transparent 45%),
+        var(--bg);
+    }
+    .login-card {
+      width: min(420px, 92vw); background: var(--panel);
+      border: 1px solid var(--line); border-radius: 16px; padding: 28px;
+    }
+    .login-card h1 { font-size: 22px; margin: 12px 0 6px; }
+    .login-card p { color: var(--muted); font-size: 14px; margin-bottom: 22px; }
+    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    input, select {
+      width: 100%; background: var(--bg); border: 1px solid var(--line);
+      color: var(--text); border-radius: 8px; padding: 10px 12px; margin-bottom: 14px;
+      font-size: 14px;
+    }
+    .btn {
+      border: 0; border-radius: 8px; padding: 10px 14px; cursor: pointer;
+      font-weight: 600; font-size: 14px;
+    }
+    .btn-amber { background: var(--amber); color: #1a1404; width: 100%; }
+    .btn-ghost { background: #24302a; color: var(--text); }
+    .btn-sm { padding: 6px 10px; font-size: 12px; }
+
+    /* cards */
+    .grid { display: grid; gap: 14px; }
+    .g-4 { grid-template-columns: repeat(4, 1fr); }
+    .g-3 { grid-template-columns: repeat(3, 1fr); }
+    .g-2 { grid-template-columns: 1.3fr .7fr; }
+    .g-mission { grid-template-columns: 1.1fr .9fr; }
+    .card {
+      background: var(--panel); border: 1px solid var(--line);
+      border-radius: 12px; padding: 16px;
+    }
+    .kpi .label { font-size: 12px; color: var(--muted); }
+    .kpi .value { font-size: 26px; font-weight: 700; margin: 6px 0 2px; letter-spacing: -0.03em; }
+    .kpi .delta { font-size: 12px; }
+    .bad { color: var(--bad); }
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; color: var(--muted); font-weight: 500; padding: 8px 6px; border-bottom: 1px solid var(--line); }
+    td { padding: 10px 6px; border-bottom: 1px solid #24302c; }
+    tr { cursor: pointer; }
+    tr:hover td { background: #222c28; }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 99px;
+    }
+    .pill-live { background: #1e3d32; color: var(--ok); }
+    .pill-alert { background: #3d221e; color: #ff8b7a; }
+    .pill-ok { background: #1e3d32; color: var(--ok); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    h2 { font-size: 18px; font-weight: 650; margin-bottom: 4px; }
+    .sub { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
+
+    /* tanker */
+    .tanker {
+      display: flex; gap: 8px; align-items: flex-end; height: 220px;
+      padding: 12px 8px 8px; background: #121816; border-radius: 10px;
+      border: 1px dashed var(--line);
+    }
+    .comp {
+      flex: 1; height: 100%; background: #0e1210; border-radius: 8px;
+      position: relative; overflow: hidden; border: 1px solid #2c3a34;
+    }
+    .comp .fill {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(180deg, #4fd4a0, #1f7a58);
+    }
+    .comp.alert .fill { background: linear-gradient(180deg, #ff9a7a, #b33a2c); }
+    .comp span {
+      position: absolute; left: 0; right: 0; top: 8px;
+      text-align: center; font-size: 10px; color: var(--muted);
+    }
+    .comp b {
+      position: absolute; left: 0; right: 0; bottom: 8px;
+      text-align: center; font-size: 11px; font-family: "IBM Plex Mono", monospace;
+    }
+
+    .map {
+      height: 220px; border-radius: 10px; position: relative; overflow: hidden;
+      background:
+        linear-gradient(#1c2a22 1px, transparent 1px) 0 0 / 24px 24px,
+        linear-gradient(90deg, #1c2a22 1px, transparent 1px) 0 0 / 24px 24px,
+        #141b17;
+    }
+    .route {
+      position: absolute; left: 12%; top: 58%; width: 70%; height: 4px;
+      background: #3d5248; border-radius: 4px;
+    }
+    .route::after {
+      content: ""; position: absolute; left: 0; top: 0; height: 100%; width: 62%;
+      background: var(--amber); border-radius: 4px;
+    }
+    .pin {
+      position: absolute; width: 12px; height: 12px; border-radius: 50%;
+      background: var(--amber); box-shadow: 0 0 0 6px #e4a31a33;
+      left: 54%; top: 54%;
+    }
+    .pin-a { left: 10%; top: 54%; background: var(--ok); box-shadow: 0 0 0 6px #3dba8b33; }
+    .pin-b { left: 80%; top: 54%; background: var(--sp); box-shadow: 0 0 0 6px #6ea8ff33; }
+    .map-label { position: absolute; font-size: 11px; color: var(--muted); }
+    .map-label.a { left: 8%; top: 28%; }
+    .map-label.b { right: 8%; top: 28%; }
+
+    .alert-row {
+      display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line);
+    }
+    .alert-row time { color: var(--muted); font-size: 12px; width: 70px; flex-shrink: 0; }
+
+    .recon { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 8px; align-items: center; }
+    .recon .box { background: #121816; border-radius: 10px; padding: 12px; text-align: center; }
+    .recon .box .n { font-size: 22px; font-weight: 700; font-family: "IBM Plex Mono", monospace; }
+    .arrow { color: var(--muted); }
+
+    .stack-table td { cursor: default; }
+    .check { color: var(--ok); font-weight: 700; }
+
+    .mobile-frame {
+      max-width: 380px; margin: 0 auto;
+      background: #121816; border: 1px solid var(--line); border-radius: 24px;
+      padding: 20px 16px 28px;
+    }
+    .role-switch { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+
+    @media (max-width: 980px) {
+      .g-4, .g-3, .g-2, .g-mission { grid-template-columns: 1fr; }
+      .app { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+    }
+    .screen { display: none; }
+    .screen.on { display: block; }
+  </style>
+</head>
+<body>
+  <div class="app login-mode" id="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">TC</div>
+        <div>TraceCiterne<small>GESTOCI → station</small></div>
+      </div>
+      <div class="nav-label">Pilotage</div>
+      <button class="nav-btn" data-go="reseau">Réseau</button>
+      <button class="nav-btn" data-go="station">Station Cocody</button>
+      <button class="nav-btn" data-go="mission">Mission live</button>
+      <button class="nav-btn" data-go="alertes">Alertes</button>
+      <div class="nav-label">Terrain</div>
+      <button class="nav-btn" data-go="pompe">Relevé pompes</button>
+      <button class="nav-btn" data-go="docs">Documents</button>
+      <div class="nav-label">Décision</div>
+      <button class="nav-btn" data-go="stack">Stack technique</button>
+    </aside>
+    <div class="main">
+      <header class="topbar">
+        <div class="crumb">TraceCiterne · <strong id="crumb">Connexion</strong></div>
+        <div class="who">Rôle démo : <b id="who">—</b></div>
+      </header>
+      <div class="content">
+
+        <section class="screen on" id="login">
+          <div class="login-wrap">
+            <div class="login-card">
+              <div class="logo">TC</div>
+              <h1>TraceCiterne</h1>
+              <p>Maquettes cliquables. Choisissez un rôle pour voir l’écran correspondant.</p>
+              <label>Identifiant</label>
+              <input value="kouadio.dirigeant" readonly />
+              <label>Rôle</label>
+              <select id="role">
+                <option value="reseau">Dirigeant — toutes les stations</option>
+                <option value="station">Gérant — une station</option>
+                <option value="mission">Superviseur — mission / jauge</option>
+                <option value="pompe">Pompiste — index pompes</option>
+                <option value="mission">Chauffeur — mission live</option>
+              </select>
+              <button class="btn btn-amber" id="enter">Entrer dans la maquette</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="reseau">
+          <h2>Réseau — 4 stations</h2>
+          <p class="sub">Vue dirigeant : stocks, livraisons en cours, manquants cumulés (7 jours).</p>
+          <div class="grid g-4" style="margin-bottom:14px">
+            <div class="card kpi"><div class="label">Volume en transit</div><div class="value mono">42 180 L</div><div class="delta ok">1 camion live</div></div>
+            <div class="card kpi"><div class="label">Manquants 7 j</div><div class="value mono bad">−3 240 L</div><div class="delta bad">hors tolérance 0,5 %</div></div>
+            <div class="card kpi"><div class="label">Alertes ouvertes</div><div class="value mono warn">2</div><div class="delta">1 siphonnage suspect</div></div>
+            <div class="card kpi"><div class="label">Stock réseau</div><div class="value mono">186 400 L</div><div class="delta">SP + gasoil</div></div>
+          </div>
+          <div class="card">
+            <table>
+              <thead><tr><th>Station</th><th>Cuves</th><th>Dernière livraison</th><th>Écart</th><th>État</th></tr></thead>
+              <tbody>
+                <tr data-go="station"><td>Cocody Angré</td><td>3</td><td>Aujourd’hui · 45 000 L</td><td class="bad mono">−1 820 L</td><td><span class="pill pill-alert"><span class="dot"></span>Alerte trajet</span></td></tr>
+                <tr><td>Yopougon</td><td>2</td><td>Hier · 32 000 L</td><td class="ok mono">−80 L</td><td><span class="pill pill-ok"><span class="dot"></span>OK</span></td></tr>
+                <tr><td>Bassam</td><td>2</td><td>Lun. · 28 000 L</td><td class="ok mono">−40 L</td><td><span class="pill pill-ok"><span class="dot"></span>OK</span></td></tr>
+                <tr><td>Bouaké</td><td>4</td><td>Dim. · 40 000 L</td><td class="warn mono">−390 L</td><td><span class="pill pill-alert"><span class="dot"></span>À jauger</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="screen" id="station">
+          <h2>Station Cocody Angré</h2>
+          <p class="sub">Gérant : stocks cuves, jauges, pompes. Les autres stations sont masquées.</p>
+          <div class="grid g-3" style="margin-bottom:14px">
+            <div class="card"><div class="label muted">Cuve 1 · SP</div><div class="tanker" style="height:120px"><div class="comp"><div class="fill" style="height:62%"></div><span>C1</span><b>12 400</b></div></div></div>
+            <div class="card"><div class="label muted">Cuve 2 · Gasoil</div><div class="tanker" style="height:120px"><div class="comp"><div class="fill" style="height:44%"></div><span>C2</span><b>8 900</b></div></div></div>
+            <div class="card"><div class="label muted">Cuve 3 · Gasoil</div><div class="tanker" style="height:120px"><div class="comp"><div class="fill" style="height:28%"></div><span>C3</span><b>5 600</b></div></div></div>
+          </div>
+          <div class="grid g-2">
+            <div class="card">
+              <h2 style="font-size:15px">Jauges du jour</h2>
+              <p class="sub">Minuit · Ouverture 05:40 · Midi — saisie identifiée</p>
+              <table>
+                <thead><tr><th>Heure</th><th>Agent</th><th>C1</th><th>C2</th><th>C3</th></tr></thead>
+                <tbody>
+                  <tr><td>00:05</td><td>A. Yao</td><td>13 100</td><td>9 200</td><td>6 000</td></tr>
+                  <tr><td>05:42</td><td>A. Yao</td><td>12 880</td><td>9 050</td><td>5 920</td></tr>
+                  <tr><td>12:03</td><td>—</td><td colspan="3" style="color:var(--muted)">En attente relevé</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="card">
+              <h2 style="font-size:15px">Livraison en cours</h2>
+              <p class="sub">Camion CI-4421-AB · 7 compartiments</p>
+              <p>Chargé GESTOCI <span class="mono">45 000 L</span></p>
+              <p style="margin:8px 0">Sondes trajet <span class="mono">43 180 L</span></p>
+              <button class="btn btn-amber btn-sm" data-go="mission">Ouvrir la mission</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="mission">
+          <h2>Mission M-184 · GESTOCI → Cocody</h2>
+          <p class="sub">Chauffeur K. Diabaté · Citerne 7 compartiments · suivi temps réel</p>
+          <div class="recon card" style="margin-bottom:14px">
+            <div class="box"><div class="label">GESTOCI</div><div class="n">45 000 L</div><div class="sub" style="margin:0">Bon #G-9921</div></div>
+            <div class="arrow">→</div>
+            <div class="box"><div class="label">Trajet (sondes)</div><div class="n bad">43 180 L</div><div class="sub" style="margin:0">−1 820 L · km 42</div></div>
+            <div class="arrow">→</div>
+            <div class="box"><div class="label">Dépotage (cuves)</div><div class="n" style="color:var(--muted)">—</div><div class="sub" style="margin:0">En attente arrivée</div></div>
+          </div>
+          <div class="grid g-mission">
+            <div class="card">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                <strong>Citerne — niveaux</strong>
+                <span class="pill pill-live"><span class="dot"></span>Live 4G</span>
+              </div>
+              <div class="tanker">
+                <div class="comp"><div class="fill" style="height:92%"></div><span>1</span><b>6200</b></div>
+                <div class="comp"><div class="fill" style="height:90%"></div><span>2</span><b>6100</b></div>
+                <div class="comp alert"><div class="fill" style="height:48%"></div><span>3</span><b>3100</b></div>
+                <div class="comp"><div class="fill" style="height:88%"></div><span>4</span><b>6000</b></div>
+                <div class="comp"><div class="fill" style="height:91%"></div><span>5</span><b>6150</b></div>
+                <div class="comp"><div class="fill" style="height:86%"></div><span>6</span><b>5830</b></div>
+                <div class="comp"><div class="fill" style="height:90%"></div><span>7</span><b>5800</b></div>
+              </div>
+              <p class="sub" style="margin:10px 0 0">Compartiment 3 : baisse −1 820 L hors géofence station — suspicion siphonnage.</p>
+            </div>
+            <div class="card">
+              <strong>Position</strong>
+              <div class="map" style="margin-top:10px">
+                <div class="map-label a">GESTOCI</div>
+                <div class="map-label b">Cocody</div>
+                <div class="route"></div>
+                <div class="pin pin-a"></div>
+                <div class="pin"></div>
+                <div class="pin pin-b"></div>
+              </div>
+              <p class="sub" style="margin-top:10px">Dernier point 14:12 · 5°22.1' N · hors station</p>
+              <button class="btn btn-ghost btn-sm" data-go="alertes">Voir l’alerte</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="alertes">
+          <h2>Alertes</h2>
+          <p class="sub">Notification si variation de volume hors GESTOCI et hors station.</p>
+          <div class="card">
+            <div class="alert-row">
+              <time class="mono">14:12</time>
+              <div>
+                <strong class="bad">Baisse −1 820 L · compartiment 3</strong>
+                <p class="sub" style="margin:4px 0 0">Camion CI-4421-AB · km 42 · hors géofence · push dirigeant + gérant</p>
+              </div>
+            </div>
+            <div class="alert-row">
+              <time class="mono">13:58</time>
+              <div>
+                <strong class="warn">Arrêt 18 min · même position</strong>
+                <p class="sub" style="margin:4px 0 0">Corrélé à la baisse de niveau — à qualifier (vol / fuite / erreur sonde)</p>
+              </div>
+            </div>
+            <div class="alert-row">
+              <time class="mono">06:02</time>
+              <div>
+                <strong>Sonde cuve 3 Cocody — RSSI faible</strong>
+                <p class="sub" style="margin:4px 0 0">Pas de trou de donnée &gt; 2 min — watchdog OK</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="pompe">
+          <h2>Relevé pompiste</h2>
+          <p class="sub">Écran mobile. Identification obligatoire avant saisie. Photo du compteur.</p>
+          <div class="mobile-frame">
+            <p class="who" style="margin-bottom:12px">Connecté : <b>M. Traoré</b> · Pompe 2</p>
+            <label>Moment</label>
+            <select><option>Ouverture (5h–6h)</option><option>Midi</option><option>Minuit</option><option>Clôture</option></select>
+            <label>Index pompe 2 (litres)</label>
+            <input class="mono" value="1 204 338" />
+            <label>Photo compteur</label>
+            <div class="card" style="margin-bottom:14px;text-align:center;color:var(--muted)">[ Caméra — capture ]</div>
+            <button class="btn btn-amber">Valider le relevé</button>
+            <p class="sub" style="margin-top:12px;margin-bottom:0">Horodatage et identité figés. Le pompiste ne voit pas les autres stations ni les alertes trajet.</p>
+          </div>
+        </section>
+
+        <section class="screen" id="docs">
+          <h2>Documents de mission</h2>
+          <p class="sub">Bon GESTOCI, bon de livraison, photos de jauge — liés à M-184.</p>
+          <div class="card">
+            <table>
+              <thead><tr><th>Fichier</th><th>Type</th><th>Lié à</th><th>Par</th></tr></thead>
+              <tbody>
+                <tr><td>bon-g-9921.pdf</td><td>Chargement GESTOCI</td><td>M-184</td><td>Superviseur</td></tr>
+                <tr><td>photo-t-compartiment-3.jpg</td><td>Mesure T camion</td><td>M-184 · C3</td><td>Chauffeur</td></tr>
+                <tr><td>bl-cocody.pdf</td><td>Livraison</td><td>—</td><td>En attente dépotage</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="screen" id="stack">
+          <h2>Stack proposée — à valider</h2>
+          <p class="sub">Aucun code métier tant que ces choix ne sont pas validés. Détail : <span class="mono">docs/STACK.md</span></p>
+          <div class="card" style="margin-bottom:14px">
+            <table class="stack-table">
+              <thead><tr><th>Couche</th><th>Choix</th><th>MVP</th></tr></thead>
+              <tbody>
+                <tr><td>Web / PWA</td><td>Next.js 15 + TypeScript + Tailwind + shadcn</td><td class="check">oui</td></tr>
+                <tr><td>API</td><td>NestJS + WebSocket</td><td class="check">oui</td></tr>
+                <tr><td>IoT</td><td>MQTT (EMQX) TLS</td><td class="check">oui</td></tr>
+                <tr><td>Données</td><td>PostgreSQL 16 + TimescaleDB + Redis</td><td class="check">oui</td></tr>
+                <tr><td>Cartes</td><td>Leaflet + OSM</td><td class="check">oui</td></tr>
+                <tr><td>Fichiers</td><td>S3 / MinIO</td><td class="check">oui</td></tr>
+                <tr><td>Mobile natif</td><td>Non — PWA seulement</td><td>hors MVP</td></tr>
+                <tr><td>Kafka / K8s</td><td>Non</td><td>hors MVP</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <p style="margin-bottom:10px">À cocher avant développement :</p>
+            <ol style="color:var(--muted);font-size:14px;padding-left:18px;line-height:1.7">
+              <li>Next + Nest + Postgres/Timescale + MQTT + Redis + PWA</li>
+              <li>Pas d’app native au MVP</li>
+              <li>Leaflet, pas Mapbox</li>
+              <li>Un seul Postgres (pas Influx à part)</li>
+              <li>Sondes agnostiques via MQTT</li>
+            </ol>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+  <script>
+    const titles = {
+      login: "Connexion",
+      reseau: "Réseau",
+      station: "Station Cocody",
+      mission: "Mission live",
+      alertes: "Alertes",
+      pompe: "Relevé pompes",
+      docs: "Documents",
+      stack: "Stack technique"
+    };
+    const who = {
+      login: "—",
+      reseau: "Dirigeant",
+      station: "Gérant Cocody",
+      mission: "Superviseur / chauffeur",
+      alertes: "Dirigeant",
+      pompe: "Pompiste",
+      docs: "Superviseur",
+      stack: "Équipe projet"
+    };
+    function go(id) {
+      document.querySelectorAll(".screen").forEach((s) => s.classList.toggle("on", s.id === id));
+      document.querySelectorAll(".nav-btn").forEach((b) => b.classList.toggle("active", b.dataset.go === id));
+      const shell = document.getElementById("shell");
+      shell.classList.toggle("login-mode", id === "login");
+      document.getElementById("crumb").textContent = titles[id] || id;
+      document.getElementById("who").textContent = who[id] || "";
+    }
+    document.getElementById("enter").onclick = () => go(document.getElementById("role").value);
+    document.querySelectorAll("[data-go]").forEach((el) => {
+      el.addEventListener("click", () => go(el.dataset.go));
+    });
+  </script>
+</body>
+</html>
