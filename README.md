@@ -31,6 +31,9 @@ npm run build
 ```
 
 La proposition d’architecture complète est documentée dans
-[`docs/STACK.md`](docs/STACK.md). L’application web est déployable sur Vercel ;
-le futur broker MQTT et le worker d’ingestion IoT resteront sur un service
-persistant séparé.
+[`docs/STACK.md`](docs/STACK.md). La préparation du modèle de données (sortie
+de `localStorage` vers Postgres multi-tenant) est dans
+[`docs/DATABASE.md`](docs/DATABASE.md).
+
+L’application web est déployable sur Vercel ; le futur broker MQTT et le
+worker d’ingestion IoT resteront sur un service persistant séparé.
