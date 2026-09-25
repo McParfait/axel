@@ -20,7 +20,7 @@ Cette note est **la décision à trancher**. Les mockups (`mockups/index.html`) 
 
 | Couche | Choix | Pourquoi |
 |---|---|---|
-| Web / PWA | **Next.js 15** (App Router) + TypeScript | Dashboards, auth, cartes, saisie mobile, un seul déploiement. |
+| Web / PWA | **Next.js 16** (App Router) + TypeScript | Dashboards, auth, cartes, saisie mobile, un seul déploiement. |
 | UI | **Tailwind CSS** + **shadcn/ui** | Prototypes → prod sans refonte. |
 | Cartes | **Leaflet** + tuiles OSM | Gratuit, suffisant pour 2 camions + géofences. |
 | Temps réel UI | **WebSocket** (Socket.IO ou native Nest) | Niveaux citerne / cuves + alertes live. |
@@ -33,7 +33,8 @@ Cette note est **la décision à trancher**. Les mockups (`mockups/index.html`) 
 | Fichiers | **S3 compatible** (MinIO en local, R2/S3 en prod) | Bons GESTOCI, photos jauge / index. |
 | App mobile MVP | **PWA** (installable, caméra, GPS navigateur) | Évite React Native tant qu’il y a 2 camions. |
 | Conteneurs | **Docker Compose** | API + Postgres + Redis + EMQX + MinIO. |
-| Hébergement cible | VPS (Abidjan / Europe) + 4G gateways | Latence CI, pas de lock-in cloud obligatoire. |
+| Hébergement web | **Vercel** | Déploiement continu de la PWA et du portail clients. |
+| Hébergement IoT | VPS / service managé séparé | MQTT et les connexions persistantes ne doivent pas tourner dans les fonctions Vercel. |
 
 ### Ingestion capteurs (contrat, pas le fournisseur de sonde)
 
@@ -75,7 +76,7 @@ Payload minimal : `camionId`, `compartimentId`, `niveauMm`, `litres`, `lat`, `ln
 
 Cochez avant d’écrire du code métier :
 
-1. **Next.js + NestJS + Postgres/Timescale + MQTT (EMQX) + Redis + PWA** comme socle MVP.
+1. **Next.js 16 + NestJS + Postgres/Timescale + MQTT (EMQX) + Redis + PWA** comme socle MVP.
 2. **Pas d’app native** au MVP.
 3. **Leaflet / OSM**, pas Mapbox.
 4. **Un seul Postgres** (pas Influx séparé).

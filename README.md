@@ -1,15 +1,36 @@
-# TraceCiterne (axel)
+# ProFuel — Sud Contractors
 
-Proposition produit : traçabilité carburant de la GESTOCI jusqu’aux cuves de station.
+Prototype fonctionnel de traçabilité du carburant, du chargement GESTOCI
+jusqu’au déversement dans les cuves de station.
 
-## À valider en premier
+## Fonctionnalités du prototype
 
-La **stack technique** : [`docs/STACK.md`](docs/STACK.md)
+- identité visuelle Sud Contractors ;
+- portail multi-clients ;
+- chargement par compartiment ;
+- trajet et télémétrie simulée ;
+- simulation d’une perte hors géofence ;
+- déversement dans les cuves ;
+- rapprochement automatique et journal horodaté ;
+- sauvegarde de la mission dans le navigateur.
 
-Tant que les 5 points de cette note ne sont pas validés, on ne démarre pas le code métier.
+## Lancer localement
 
-## Maquettes
+```bash
+npm install
+npm run dev
+```
 
-Ouvrir [`mockups/index.html`](mockups/index.html) dans un navigateur (fichier local, sans serveur).
+Puis ouvrir `http://localhost:3000`.
 
-Écrans : connexion par rôle, réseau, station, mission live (citerne + rapprochement), alertes, relevé pompes, documents, page stack.
+## Vérifications
+
+```bash
+npm run lint
+npm run build
+```
+
+La proposition d’architecture complète est documentée dans
+[`docs/STACK.md`](docs/STACK.md). L’application web est déployable sur Vercel ;
+le futur broker MQTT et le worker d’ingestion IoT resteront sur un service
+persistant séparé.
