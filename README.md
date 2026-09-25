@@ -12,7 +12,15 @@ jusqu’au déversement dans les cuves de station.
 - simulation d’une perte hors géofence ;
 - déversement dans les cuves ;
 - rapprochement automatique et journal horodaté ;
-- sauvegarde de la mission dans le navigateur.
+- sauvegarde de la mission dans Postgres Neon (Vercel)
+- endpoint `/api/health` pour vérifier la connexion
+
+## Base de données
+
+L’intégration Neon est branchée via les variables Vercel `DATABASE_URL` et
+`DATABASE_URL_UNPOOLED`. Le schéma Prisma est dans `prisma/schema.prisma`.
+Le build de production exécute `prisma migrate deploy` puis initialise les
+données de démonstration au premier appel de `/api/health`.
 
 ## Lancer localement
 

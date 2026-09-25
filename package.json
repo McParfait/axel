@@ -4,9 +4,16 @@
   "description": "Proposition produit : traçabilité carburant de la GESTOCI jusqu’aux cuves de station.",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && node scripts/db-deploy.mjs && next build",
+    "postinstall": "prisma generate",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "db:migrate": "prisma migrate deploy",
+    "db:seed": "prisma db seed",
+    "db:push": "prisma db push"
+  },
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
   },
   "repository": {
     "type": "git",
@@ -20,6 +27,7 @@
   },
   "homepage": "https://github.com/McParfait/axel#readme",
   "dependencies": {
+    "@prisma/client": "^6.19.3",
     "@tailwindcss/postcss": "^4.3.3",
     "lucide-react": "^1.48.0",
     "next": "^16.3.6",
@@ -33,6 +41,8 @@
     "@types/react-dom": "^19.3.0",
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.3.6",
+    "prisma": "^6.19.3",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.3"
   }
 }

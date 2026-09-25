@@ -21,34 +21,16 @@ import {
   Truck,
   Users,
 } from "lucide-react";
+import type { MissionDTO, TenantDTO } from "@/lib/missions";
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 type Stage = "draft" | "transit" | "unloading" | "completed";
 type Tab = "dashboard" | "operation" | "clients";
-
-type EventItem = {
-  label: string;
-  detail: string;
-  time: string;
-  status: "done" | "alert" | "pending";
-};
-
-type Mission = {
-  stage: Stage;
-  missionId: string;
-  truck: string;
-  driver: string;
-  source: string;
-  destination: string;
-  product: string;
-  compartments: number[];
-  tankReceipts: number[];
-  eventLog: EventItem[];
-  alertLoss: number;
-};
+type Mission = MissionDTO;
 
 const initialMission: Mission = {
+  id: "",
   stage: "draft",
   missionId: "SC-260925-01",
   truck: "CI-4421-AB",
@@ -69,7 +51,7 @@ const initialMission: Mission = {
   ],
 };
 
-const clients = [
+const fallbackClients: TenantDTO[] = [
   {
     name: "Pétro Ivoire Distribution",
     code: "PID-CI",
@@ -88,12 +70,6 @@ const clients = [
 
 const formatLiters = (value: number) =>
   `${new Intl.NumberFormat("fr-FR").format(Math.max(0, value))} L`;
-
-const now = () =>
-  new Intl.DateTimeFormat("fr-FR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date());
 
 function Logo({ compact = false }: { compact?: boolean }) {
   return (
@@ -156,33 +132,63 @@ function Stepper({ stage }: { stage: Stage }) {
 export default function Home() {
   const [tab, setTab] = useState<Tab>("dashboard");
   const [mission, setMission] = useState<Mission>(initialMission);
-  const [tenant, setTenant] = useState(clients[0].name);
-  const [hydrated, setHydrated] = useState(false);
+  const [tenantCode, setTenantCode] = useState("PID-CI");
+  const [clients, setClients] = useState<TenantDTO[]>(fallbackClients);
+  const [dbState, setDbState] = useState<"loading" | "online" | "offline">(
+    "loading",
+  );
+  const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      const saved = window.localStorage.getItem("sud-contractors-profuel");
-      if (saved) {
-        try {
-          setMission(JSON.parse(saved));
-        } catch {
-          window.localStorage.removeItem("sud-contractors-profuel");
-        }
-      }
-      setHydrated(true);
-    }, 0);
+  const tenantName =
+    clients.find((client) => client.code === tenantCode)?.name ?? tenantCode;
 
-    return () => window.clearTimeout(timer);
+  const applyMission = (next: Mission) => {
+    setMission(next);
+  };
+
+  const loadTenant = useCallback(async (code: string) => {
+    const health = await fetch("/api/health").then((response) => response.json());
+    setDbState(health.connected ? "online" : "offline");
+    const payload = await fetch(`/api/bootstrap?tenant=${code}`).then((response) =>
+      response.json(),
+    );
+    if (payload.tenants) setClients(payload.tenants);
+    if (payload.mission) applyMission(payload.mission);
+    else if (health.connected) {
+      const created = await fetch("/api/bootstrap", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tenant: code }),
+      }).then((response) => response.json());
+      if (created.mission) applyMission(created.mission);
+    }
   }, []);
 
   useEffect(() => {
-    if (hydrated) {
-      window.localStorage.setItem(
-        "sud-contractors-profuel",
-        JSON.stringify(mission),
-      );
+    const timer = window.setTimeout(() => {
+      void loadTenant(tenantCode);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [loadTenant, tenantCode]);
+
+  const runAction = async (
+    action: string,
+    extra?: { litres?: number[] },
+  ) => {
+    if (!mission.id || dbState !== "online") return null;
+    setSaving(true);
+    try {
+      const payload = await fetch(`/api/missions/${mission.id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, ...extra }),
+      }).then((response) => response.json());
+      if (payload.mission) applyMission(payload.mission);
+      return payload.mission as Mission | undefined;
+    } finally {
+      setSaving(false);
     }
-  }, [mission, hydrated]);
+  };
 
   const loaded = useMemo(
     () => mission.compartments.reduce((sum, value) => sum + value, 0),
@@ -197,110 +203,52 @@ export default function Home() {
   const gapPercent = loaded ? (finalGap / loaded) * 100 : 0;
 
   const updateCompartment = (index: number, value: number) => {
-    setMission((current) => ({
-      ...current,
-      compartments: current.compartments.map((amount, i) =>
-        i === index ? Math.max(0, value || 0) : amount,
-      ),
-    }));
+    const compartments = mission.compartments.map((amount, i) =>
+      i === index ? Math.max(0, value || 0) : amount,
+    );
+    setMission((current) => ({ ...current, compartments }));
+    void runAction("compartments", { litres: compartments });
   };
 
   const confirmLoading = () => {
     if (!loaded) return;
-    setMission((current) => ({
-      ...current,
-      stage: "transit",
-      eventLog: [
-        ...current.eventLog,
-        {
-          label: "Chargement certifié",
-          detail: `${formatLiters(loaded)} répartis dans ${current.compartments.length} compartiments`,
-          time: now(),
-          status: "done",
-        },
-        {
-          label: "Départ de GESTOCI",
-          detail: "Scellés contrôlés · télémétrie active",
-          time: now(),
-          status: "done",
-        },
-      ],
-    }));
+    void runAction("certify");
   };
 
   const simulateLoss = () => {
     if (mission.alertLoss) return;
-    setMission((current) => ({
-      ...current,
-      alertLoss: 620,
-      eventLog: [
-        ...current.eventLog,
-        {
-          label: "Variation hors zone autorisée",
-          detail: "−620 L · compartiment 3 · arrêt de 12 min au km 42",
-          time: now(),
-          status: "alert",
-        },
-      ],
-    }));
+    void runAction("simulate-loss");
   };
 
   const arriveAtStation = () => {
-    const amount = inTruck;
-    const firstTank = Math.round(amount * 0.54);
-    setMission((current) => ({
-      ...current,
-      stage: "unloading",
-      tankReceipts: [firstTank, amount - firstTank],
-      eventLog: [
-        ...current.eventLog,
-        {
-          label: "Arrivée à la station",
-          detail: `${formatLiters(amount)} mesurés avant déversement`,
-          time: now(),
-          status: "done",
-        },
-      ],
-    }));
+    void runAction("arrive");
   };
 
   const completeUnloading = () => {
-    setMission((current) => ({
-      ...current,
-      stage: "completed",
-      eventLog: [
-        ...current.eventLog,
-        {
-          label: "Déversement terminé",
-          detail: `${formatLiters(unloaded)} reçus dans les cuves de la station`,
-          time: now(),
-          status: "done",
-        },
-        {
-          label: "Rapprochement généré",
-          detail: `Écart total : ${formatLiters(loaded - unloaded)} (${gapPercent.toFixed(2)} %)`,
-          time: now(),
-          status: loaded - unloaded > loaded * 0.005 ? "alert" : "done",
-        },
-      ],
-    }));
+    void runAction("close");
   };
 
-  const resetMission = () => {
-    setMission({
-      ...initialMission,
-      missionId: `SC-${new Date().toISOString().slice(2, 10).replaceAll("-", "")}-01`,
-    });
-    setTab("operation");
+  const resetMission = async () => {
+    setSaving(true);
+    try {
+      const payload = await fetch("/api/bootstrap", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tenant: tenantCode }),
+      }).then((response) => response.json());
+      if (payload.mission) applyMission(payload.mission);
+      setTab("operation");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const setReceipt = (index: number, value: number) => {
-    setMission((current) => ({
-      ...current,
-      tankReceipts: current.tankReceipts.map((amount, i) =>
-        i === index ? Math.max(0, value || 0) : amount,
-      ),
-    }));
+    const tankReceipts = mission.tankReceipts.map((amount, i) =>
+      i === index ? Math.max(0, value || 0) : amount,
+    );
+    setMission((current) => ({ ...current, tankReceipts }));
+    void runAction("receipts", { litres: tankReceipts });
   };
 
   return (
@@ -310,9 +258,14 @@ export default function Home() {
         <div className="tenant-picker">
           <span>ESPACE CLIENT</span>
           <Building2 size={16} />
-          <select value={tenant} onChange={(event) => setTenant(event.target.value)}>
+          <select
+            value={tenantCode}
+            onChange={(event) => setTenantCode(event.target.value)}
+          >
             {clients.map((client) => (
-              <option key={client.code}>{client.name}</option>
+              <option key={client.code} value={client.code}>
+                {client.name}
+              </option>
             ))}
           </select>
           <ChevronDown size={15} />
@@ -343,9 +296,14 @@ export default function Home() {
         <div className="sidebar-foot">
           <div className="live-chip">
             <span />
-            Systèmes opérationnels
+            {dbState === "online"
+              ? "Neon connecté"
+              : dbState === "loading"
+                ? "Connexion Neon…"
+                : "Neon hors ligne"}
+            {saving ? " · sync" : ""}
           </div>
-          <small>Prototype de validation · données locales</small>
+          <small>Mission persistée dans Postgres Neon via Vercel</small>
         </div>
       </aside>
 
@@ -385,7 +343,7 @@ export default function Home() {
               loaded={loaded}
               inTruck={inTruck}
               unloaded={unloaded}
-              tenant={tenant}
+              tenant={tenantName}
               openWorkflow={() => setTab("operation")}
             />
           )}
@@ -448,7 +406,7 @@ export default function Home() {
             </section>
           )}
 
-          {tab === "clients" && <ClientsPage tenant={tenant} />}
+          {tab === "clients" && <ClientsPage tenant={tenantName} clients={clients} />}
         </div>
       </main>
     </div>
@@ -1018,7 +976,13 @@ function EventTimeline({ events }: { events: EventItem[] }) {
   );
 }
 
-function ClientsPage({ tenant }: { tenant: string }) {
+function ClientsPage({
+  tenant,
+  clients,
+}: {
+  tenant: string;
+  clients: TenantDTO[];
+}) {
   return (
     <section>
       <div className="page-intro">
