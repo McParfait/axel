@@ -1764,3 +1764,147 @@ input:focus {
     border-bottom: 1px solid var(--slate-100);
   }
 }
+
+.document-vault {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--slate-100);
+}
+
+.document-vault select {
+  width: 100%;
+  margin-top: 7px;
+  padding: 11px 12px;
+  border: 1px solid var(--slate-200);
+  background: var(--slate-50);
+  border-radius: 11px;
+  color: var(--slate-900);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.document-controls {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 12px;
+}
+
+.file-button {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--navy);
+  color: white;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.file-button input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+}
+
+.signature-pad {
+  border: 1px dashed var(--slate-300);
+  border-radius: 14px;
+  background: #fffdf8;
+  padding: 10px;
+  margin-bottom: 12px;
+}
+
+.signature-pad canvas {
+  width: 100%;
+  height: 140px;
+  display: block;
+  border-radius: 10px;
+  background: white;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.signature-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.document-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.document-list li {
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--slate-200);
+  border-radius: 12px;
+  background: var(--slate-50);
+}
+
+.document-list a {
+  color: var(--navy);
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.document-list small,
+.document-empty {
+  display: block;
+  color: var(--slate-500);
+  font-size: 8px;
+  margin-top: 3px;
+}
+
+.doc-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: var(--orange-soft);
+  color: var(--orange);
+}
+
+.icon-button {
+  border: 0;
+  background: white;
+  color: var(--red);
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+}
+
+.document-error {
+  color: var(--red);
+  font-size: 10px;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+
+.document-empty {
+  padding: 12px;
+  border: 1px dashed var(--slate-200);
+  border-radius: 12px;
+}

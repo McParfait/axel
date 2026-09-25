@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "./prisma";
 import { ensureDemoData } from "./seed-demo";
+import { serializeDocuments, type DocumentDTO } from "./documents";
 
 export type MissionDTO = {
   id: string;
@@ -20,6 +21,7 @@ export type MissionDTO = {
     status: "done" | "alert" | "pending";
   }[];
   alertLoss: number;
+  documents: DocumentDTO[];
 };
 
 export type TenantDTO = {
@@ -39,6 +41,7 @@ const missionInclude = {
   loadingLines: { include: { compartment: true } },
   unloadingLines: { include: { tank: true } },
   events: { orderBy: { createdAt: "asc" as const } },
+  documents: { orderBy: { createdAt: "desc" as const } },
 } satisfies Prisma.MissionInclude;
 
 type MissionRecord = Prisma.MissionGetPayload<{ include: typeof missionInclude }>;
@@ -77,6 +80,7 @@ export function serializeMission(mission: MissionRecord): MissionDTO {
     compartments,
     tankReceipts,
     alertLoss: toNumber(mission.alertLossL),
+    documents: serializeDocuments(mission.documents),
     eventLog: mission.events.map((event) => ({
       label: event.label,
       detail: event.detail,

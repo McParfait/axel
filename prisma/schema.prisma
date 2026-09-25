@@ -135,8 +135,23 @@ model Mission {
   unloadingLines  UnloadingLine[]
   events          MissionEvent[]
   alerts          Alert[]
+  documents       MissionDocument[]
   @@unique([tenantId, code])
   @@index([tenantId, status])
+}
+
+model MissionDocument {
+  id          String   @id @default(cuid())
+  missionId   String
+  mission     Mission  @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  kind        String
+  fileName    String
+  contentType String
+  sizeBytes   Int
+  blobUrl     String
+  pathname    String
+  createdAt   DateTime @default(now())
+  @@index([missionId, createdAt])
 }
 
 model LoadingLine {

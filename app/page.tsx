@@ -22,6 +22,7 @@ import {
   Users,
 } from "lucide-react";
 import type { MissionDTO, TenantDTO } from "@/lib/missions";
+import { DocumentVault } from "@/components/document-vault";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -41,6 +42,7 @@ const initialMission: Mission = {
   compartments: [6500, 6500, 6500, 6500, 6500, 6500, 6000],
   tankReceipts: [0, 0],
   alertLoss: 0,
+  documents: [],
   eventLog: [
     {
       label: "Mission créée",
@@ -372,6 +374,7 @@ export default function Home() {
                   loaded={loaded}
                   onChange={updateCompartment}
                   onConfirm={confirmLoading}
+                  onMission={applyMission}
                 />
               )}
               {mission.stage === "transit" && (
@@ -390,6 +393,7 @@ export default function Home() {
                   unloaded={unloaded}
                   onChange={setReceipt}
                   onComplete={completeUnloading}
+                  onMission={applyMission}
                 />
               )}
               {mission.stage === "completed" && (
@@ -401,6 +405,7 @@ export default function Home() {
                   gap={finalGap}
                   gapPercent={gapPercent}
                   onReset={resetMission}
+                  onMission={applyMission}
                 />
               )}
             </section>
@@ -557,11 +562,13 @@ function LoadingStep({
   loaded,
   onChange,
   onConfirm,
+  onMission,
 }: {
   mission: Mission;
   loaded: number;
   onChange: (index: number, value: number) => void;
   onConfirm: () => void;
+  onMission: (mission: Mission) => void;
 }) {
   return (
     <div className="workflow-grid">
@@ -623,6 +630,12 @@ function LoadingStep({
             Certifier et démarrer <ArrowRight size={17} />
           </button>
         </div>
+        <DocumentVault
+          missionId={mission.id}
+          documents={mission.documents}
+          kinds={["loading_note", "signature_driver", "gauge_photo"]}
+          onMission={(next) => onMission(next as Mission)}
+        />
       </article>
       <OperationAside mission={mission} volume={loaded} />
     </div>
@@ -745,12 +758,14 @@ function UnloadingStep({
   unloaded,
   onChange,
   onComplete,
+  onMission,
 }: {
   mission: Mission;
   inTruck: number;
   unloaded: number;
   onChange: (index: number, value: number) => void;
   onComplete: () => void;
+  onMission: (mission: Mission) => void;
 }) {
   const difference = inTruck - unloaded;
   return (
@@ -817,6 +832,12 @@ function UnloadingStep({
             Clôturer le déversement
           </button>
         </div>
+        <DocumentVault
+          missionId={mission.id}
+          documents={mission.documents}
+          kinds={["delivery_note", "signature_receiver", "gauge_photo"]}
+          onMission={(next) => onMission(next as Mission)}
+        />
       </article>
       <OperationAside mission={mission} volume={inTruck} />
     </div>
@@ -831,6 +852,7 @@ function ReportStep({
   gap,
   gapPercent,
   onReset,
+  onMission,
 }: {
   mission: Mission;
   loaded: number;
@@ -839,6 +861,7 @@ function ReportStep({
   gap: number;
   gapPercent: number;
   onReset: () => void;
+  onMission: (mission: Mission) => void;
 }) {
   const conform = Math.abs(gapPercent) <= 0.5;
   return (
@@ -904,6 +927,19 @@ function ReportStep({
             Nouvelle mission <ArrowRight size={17} />
           </button>
         </div>
+        <DocumentVault
+          missionId={mission.id}
+          documents={mission.documents}
+          kinds={[
+            "loading_note",
+            "delivery_note",
+            "signature_driver",
+            "signature_receiver",
+            "gauge_photo",
+            "other",
+          ]}
+          onMission={(next) => onMission(next as Mission)}
+        />
       </article>
       <article className="panel">
         <div className="panel-head">

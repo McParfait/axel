@@ -13,6 +13,7 @@ jusqu’au déversement dans les cuves de station.
 - déversement dans les cuves ;
 - rapprochement automatique et journal horodaté ;
 - sauvegarde de la mission dans Postgres Neon (Vercel)
+- pièces de mission (bons, signatures, photos) sur Vercel Blob
 - endpoint `/api/health` pour vérifier la connexion
 
 ## Base de données
