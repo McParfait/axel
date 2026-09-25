@@ -953,7 +953,7 @@ function OperationAside({
   );
 }
 
-function EventTimeline({ events }: { events: EventItem[] }) {
+function EventTimeline({ events }: { events: MissionDTO["eventLog"] }) {
   return (
     <div className="event-list">
       {events.map((event, index) => (
